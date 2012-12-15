@@ -7,7 +7,7 @@
 
     jade [-h|--help] [-v|--version] [-o|--obj STR]
          [-O|--out DIR] [-p|--path PATH] [-P|--pretty]
-         [-c|--client] [-D|--no-debug]
+         [-c|--client] [-D|--no-debug] [-t|--conservative]
 
 ## Examples
 

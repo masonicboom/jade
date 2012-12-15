@@ -31,6 +31,7 @@ program
   .option('-c, --client', 'compile function for client-side runtime.js')
   .option('-D, --no-debug', 'compile without debugging (smaller functions)')
   .option('-w, --watch', 'watch files for changes and automatically re-render')
+  .option('-t, --conservative', 'only re-render files modified after rendered output')
 
 program.on('--help', function(){
   console.log('  Examples:');
@@ -83,6 +84,10 @@ options.pretty = program.pretty;
 // --watch
 
 options.watch = program.watch;
+
+// --conservative
+
+options.conservative = program.conservative;
 
 // left-over args are file paths
 
@@ -139,21 +144,37 @@ function renderFile(path) {
       fs.readFile(path, 'utf8', function(err, str){
         if (err) throw err;
         options.filename = path;
-        var fn = jade.compile(str, options);
         var extname = options.client ? '.js' : '.html';
         path = path.replace(re, extname);
         if (program.out) path = join(program.out, basename(path));
-        var dir = resolve(dirname(path));
-        mkdirp(dir, 0755, function(err){
-          if (err) throw err;
-          var output = options.client
-            ? fn.toString()
-            : fn(options);
-          fs.writeFile(path, output, function(err){
+
+        var renderAndWrite = function() {
+          var fn = jade.compile(str, options);
+          var dir = resolve(dirname(path));
+          mkdirp(dir, 0755, function(err){
             if (err) throw err;
-            console.log('  \033[90mrendered \033[36m%s\033[0m', path);
+            var output = options.client
+              ? fn.toString()
+              : fn(options);
+            fs.writeFile(path, output, function(err){
+              if (err) throw err;
+              console.log('  \033[90mrendered \033[36m%s\033[0m', path);
+            });
           });
-        });
+        }
+
+        // Decide whether to render if modified, or always render
+        if (options.conservative) {
+          fs.lstat(path, function(err, statOut) {
+            if (statOut && statOut.mtime >= stat.mtime) {
+              console.log('  \033[90mnot modified \033[36m%s\033[0m', path);
+            } else {
+              renderAndWrite();
+            }
+          });
+        } else {
+          renderAndWrite();
+        }
       });
     // Found directory
     } else if (stat.isDirectory()) {

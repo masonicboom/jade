@@ -1236,14 +1236,16 @@ Usage: jade [options] [dir|file ...]
 
 Options:
 
-  -h, --help         output usage information
-  -V, --version      output the version number
-  -o, --obj <str>    javascript options object
-  -O, --out <dir>    output the compiled html to <dir>
-  -p, --path <path>  filename used to resolve includes
-  -P, --pretty       compile pretty html output
-  -c, --client       compile for client-side runtime.js
-  -D, --no-debug     compile without debugging (smaller functions)
+  -h, --help          output usage information
+  -V, --version       output the version number
+  -o, --obj <str>     javascript options object
+  -O, --out <dir>     output the compiled html to <dir>
+  -p, --path <path>   filename used to resolve includes
+  -P, --pretty        compile pretty html output
+  -c, --client        compile function for client-side runtime.js
+  -D, --no-debug      compile without debugging (smaller functions)
+  -w, --watch         watch files for changes and automatically re-render
+  -t, --conservative  only re-render files modified after rendered output
 
 Examples:
 
